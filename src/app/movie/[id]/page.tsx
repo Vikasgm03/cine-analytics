@@ -19,7 +19,7 @@ export default async function MovieDetail({ params }: { params: Promise<{ id: st
     (vid: any) => vid.site === "YouTube" && vid.type === "Trailer"
   );
 
-  return (
+  return ( 
     <div className="min-h-screen bg-slate-950 text-white p-8">
       {/* Background with slight blur using the backdrop image */}
       <div 
