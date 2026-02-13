@@ -39,6 +39,7 @@ export default function Home() {
   const handleSearch = useDebouncedCallback(async (term: string) => {
     if (!term) {
         setIsSearching(false);
+        // Reload to show trending again if search is cleared
         window.location.reload(); 
         return;
     }
@@ -61,6 +62,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
         <div className="flex flex-col items-center gap-4 text-center">
           <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
             CineAnalytics
@@ -81,11 +83,13 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Section Title */}
         <div className="flex items-center gap-2 text-2xl font-bold border-b border-slate-800 pb-2">
             {isSearching ? <Search className="text-blue-500"/> : <TrendingUp className="text-purple-500"/>}
             {isSearching ? `Results for "${query}"` : "Trending This Week"}
         </div>
 
+        {/* Grid */}
         {loading ? (
            <div className="text-center py-20 text-gray-500 animate-pulse">Loading movies...</div>
         ) : (
@@ -102,6 +106,7 @@ export default function Home() {
                     ) : (
                         <div className="w-full h-full bg-slate-800 flex items-center justify-center text-gray-500">No Image</div>
                     )}
+                    
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                         <span className="text-white font-bold">{movie.title}</span>
                         <span className="text-yellow-400 flex items-center gap-1 text-sm">
