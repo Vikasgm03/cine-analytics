@@ -1,24 +1,26 @@
 import Link from "next/link";
 import { ArrowLeft, Calendar, Star } from "lucide-react";
 
-// 1. Notice we change the type to Promise
+// CRITICAL UPDATE: We define params as a Promise for Next.js 15+
 export default async function MovieDetail({ params }: { params: Promise<{ id: string }> }) {
   
-  // 2. We must AWAIT the params to get the ID
+  // 1. We AWAIT the params to get the ID safely
   const resolvedParams = await params;
   const id = resolvedParams.id;
 
+  // 2. Fetch the data
   const res = await fetch(
     `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
   );
   
-  // 3. Handle errors if the ID is wrong
+  // 3. If the fetch fails, show a helpful error screen
   if (!res.ok) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl font-bold text-red-500 mb-4">Movie Not Found</h1>
-        <p className="text-gray-400 mb-8">
-           Could not fetch data for ID: {id}.
+        <p className="text-gray-400 mb-8 text-center">
+           We tried to search for ID: <span className="text-yellow-400 font-mono">{id}</span><br/>
+           But the API didn't return any data.
         </p>
         <Link href="/" className="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition">
           Go Home
