@@ -1,14 +1,30 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Star, TrendingUp } from "lucide-react";
+import { ArrowLeft, Calendar, Star } from "lucide-react";
 
-export default async function MovieDetail({ params }: { params: { id: string } }) {
-  const { id } = params;
+// 1. Notice we change the type to Promise
+export default async function MovieDetail({ params }: { params: Promise<{ id: string }> }) {
+  
+  // 2. We must AWAIT the params to get the ID
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
+
   const res = await fetch(
     `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
   );
   
+  // 3. Handle errors if the ID is wrong
   if (!res.ok) {
-    return <div className="text-white text-center p-10">Movie not found.</div>;
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-bold text-red-500 mb-4">Movie Not Found</h1>
+        <p className="text-gray-400 mb-8">
+           Could not fetch data for ID: {id}.
+        </p>
+        <Link href="/" className="bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition">
+          Go Home
+        </Link>
+      </div>
+    );
   }
 
   const movie = await res.json();
@@ -21,12 +37,14 @@ export default async function MovieDetail({ params }: { params: { id: string } }
       
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-10">
         <div className="w-full md:w-1/3">
-           {movie.poster_path && (
+           {movie.poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
               alt={movie.title}
               className="rounded-xl shadow-2xl w-full border border-slate-800"
             />
+           ) : (
+             <div className="h-96 bg-slate-900 rounded-xl flex items-center justify-center text-gray-500">No Poster</div>
            )}
         </div>
         
@@ -37,23 +55,12 @@ export default async function MovieDetail({ params }: { params: { id: string } }
           <div className="flex flex-wrap gap-6 text-gray-300 mb-8">
             <span className="flex items-center gap-2"><Calendar size={18} className="text-blue-500"/> {movie.release_date}</span>
             <span className="flex items-center gap-2"><Star size={18} className="text-yellow-500"/> {movie.vote_average?.toFixed(1)} / 10</span>
-            <span className="flex items-center gap-2"><TrendingUp size={18} className="text-green-500"/> {Math.round(movie.popularity)} Popularity</span>
           </div>
           
           <div className="space-y-6">
             <div>
                 <h3 className="text-2xl font-semibold mb-2 text-white">Overview</h3>
                 <p className="text-lg leading-relaxed text-gray-300">{movie.overview}</p>
-            </div>
-
-            <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800 mt-8">
-               <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                 📊 CineAnalytics Data
-               </h3>
-               <p className="text-gray-400">
-                 This movie has been tracked in {movie.production_countries?.length || 0} regions. 
-                 Global revenue stands at <span className="text-green-400 font-mono">${movie.revenue?.toLocaleString()}</span>.
-               </p>
             </div>
           </div>
         </div>
